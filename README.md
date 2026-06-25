@@ -1,21 +1,21 @@
-# 🎓 通用期末考试 1天极速备考智能教练 (Universal Exam Cram Coach Agent Skill)
+# 🎓 通用期末考试 1天极速备考智能教练 (Universal Exam Cram Coach - LLM Wiki V2.0)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Agent: Antigravity](https://img.shields.io/badge/Agent-Antigravity-orange.svg)](#)
-[![Capability: Multi-Subject](https://img.shields.io/badge/Capability-Multi--Subject-brightgreen.svg)](#)
+[![Version: 2.0](https://img.shields.io/badge/Version-2.0--LLM--Wiki-brightgreen.svg)](#)
 
-这是一个**全科通用**的期末考试极速备考 AI 智能体技能（Agent Skill）。
+这是一个**基于 LLM Wiki 架构重构**、**全科通用**的期末考试极速备考 AI 智能体技能（Agent Skill）V2.0 版本。
 
-只要将本技能导入支持的智能体（如 VS Code 智能体插件、Cursor 或网页版 GPTs/Gemini），并提供你想要复习的科目资料（无论是高等数学、大学物理，还是历史、政治、解剖学或程序设计），智能体就会化身你的**私人专属备考教练**，带你在 1 天内突击通关。
+只要将本技能导入支持的智能体（如 VS Code 智能体插件、Cursor 或网页版 GPTs/Gemini），并提供你想要复习的科目资料，智能体就会化身你的**物理防幻觉私人专属备考教练**，带你在 1 天内突击通关。
 
 ---
 
-## 🌟 技能特色功能
+## 🚀 V2.0 重大更新特性 (What's New)
 
-1. **自动逆向规划**：自动解析用户上传的复习大纲或重点题目，生成 `study_plan.md`（备考时间表）和 `study_progress.md`（实时掌握记录进度表）。
-2. **启发式生活隐喻**：用最接地气的生活常识解释枯燥的概念。*（例如：用“媒婆相亲”解释化学催化剂，用“快递箱”解释计算机寄存器）*。
-3. **强制关卡测试**：每个复习阶段结束后，智能体会自动进行出题测验，通关后方能进入下一阶段，绝不让模糊的概念蒙混过关。
-4. **个性化易错查杀**：复习尾声自动提取错题记录，进行终极扫雷自测，并生成该科目的**“考前极简速记小抄”（Cheat Sheet）**。
+* **⚡ LLM Wiki 目录结构化加载**：丢弃了原先庞大且容易撑爆上下文的单个 Markdown 答案文件。升级为按章节/阶段的 Wiki 物理切片（`references/wiki/`），Agent 会根据复习进度 **Lazy Load (惰性加载)** 对应章节，**Token 消耗直降 90%**，长对话不再卡顿。
+* **🛠️ scripts/ingest.py 一键冷启动**：告别了手动建立题库与 Markdown 文件的繁琐操作。学生只需提供大纲或真题，由 Agent 或本地 Python 脚本一键解析，自动在后台分割好 Wiki 章节、题库并初始化进度表，实现“零摩擦”启动。
+* **🎯 标准真题库 quiz_bank.json 抽题**：测试题由“AI 即兴编造”升级为“标准真题库抽测”，规避了 AI 出无解错题、弱智题的毛病。
+* **🏃 测试逃生通道 (Hint & Skip)**：针对测试关卡设计了“查看提示”与“2次答错跳过并归档”机制，防止学生因主观题表述差异或卡壳而被死锁在当前阶段。
 
 ---
 
@@ -23,28 +23,37 @@
 
 ```text
 universal-examprep-skill/
-  ├── SKILL.md            # 技能定义核心文件（含全科通用辅导系统提示词及物理防幻觉协议）
+  ├── SKILL.md            # 技能定义核心文件（含惰性加载指令与物理防幻觉协议）
   ├── README.md           # 本使用说明
-  └── templates/          # 极速备考防幻觉记忆模板
-        ├── study_plan_template.md        # 6阶段备考突击表模板
-        ├── study_progress_template.md    # 知识点打卡自测追踪表模板
-        ├── exam_questions_template.md    # 唯一重点题库锁定模板
-        └── reference_answers_template.md # 考前标准答案锁定模板
+  ├── scripts/
+  │     └── ingest.py     # 一键大纲解析与本地 Wiki 切片脚本
+  └── templates/          # 初始化模板
+        ├── study_plan_template.md        # 阶段备考突击表模板
+        ├── study_progress_template.md    # 进度打卡自测追踪表模板
+        └── quiz_bank_template.json       # 结构化真题库 JSON 模板
 ```
 
 ---
 
 ## 🛠️ 如何导入并使用本技能
 
-### 方式 1：导入本地 AI 编辑器/插件（如 VS Code、Cursor 等）
+### 方式 1：导入本地 AI 编辑器/插件（如 VS Code、Cursor 等）- 【推荐】
 1. 下载或克隆本技能文件夹 `universal-examprep-skill` 到你的电脑。
 2. 将其放入你的智能体自定义技能目录下（例如工作区根目录下的 `.agents/skills/` 文件夹中）。
-3. 开启新对话，发送：“*启动备考教练，我的科目是【科目名称】，这是我的大纲文件...*”，即可开启学习。
+3. 开启新对话，上传你的考试大纲（PDF/图片/文档均可）。
+4. 对 AI 说：“*教练，这是我的复习大纲，请在后台帮我解析并调用 `ingest.py` 初始化我的备考 LLM Wiki 空间。*”
+5. 脚本运行完成后，AI 将根据生成的 `study_plan.md` 引导你开始按章节复习。
 
-### 方式 2：作为 Custom Instructions 导入网页端 AI（如 ChatGPT, Claude, Gemini Advanced）
-1. 打开 `SKILL.md`，复制其全部内容，粘贴到 AI 的**系统指令（System Instructions / Custom Instructions）**中。
-2. 把 `templates/` 下的模板文件和你的教材/大纲一起作为附件上传。
-3. 对 AI 说：“*你好教练，这是我的复习大纲，请开始规划我的 1 天速通课程。*”
+> **手动运行脚本方法**：
+> 如果你想在本地命令行手动执行初始化，只需将解析好的大纲 JSON 传给脚本即可：
+> ```bash
+> python scripts/ingest.py --input raw_input.json --output-dir .
+> ```
+
+### 方式 2：网页端 AI 适配使用（如 ChatGPT, Claude, Gemini Advanced）
+1. 复制 `SKILL.md` 的全部内容，粘贴到 AI 的**系统指令（System/Custom Instructions）**中。
+2. 按照 `SKILL.md` 尾部的 `网页端运行适配指南 (Web Portability)`，将生成的 `quiz_bank.json` 或 `study_plan.md` 手动上传到当前的网页会话作为挂载知识库。
+3. 对 AI 说：“*你好教练，请读取我挂载的进度，并开始对应阶段的复习。*”
 
 ---
 
