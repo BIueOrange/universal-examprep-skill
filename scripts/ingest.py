@@ -120,6 +120,8 @@ def main():
         with open(progress_template_path, 'r', encoding='utf-8') as tf:
             prog_content = tf.read()
         prog_content = prog_content.replace("《科目名称》", f"《{course_name}》")
+        first_phase_name = f"阶段 1：{phases[0].get('phase_name')}" if len(phases) > 0 else "未开始"
+        prog_content = prog_content.replace("{CURRENT_PHASE}", first_phase_name)
         
         # 如果阶段数不同，动态调整打卡状态列表
         if len(phases) > 0:

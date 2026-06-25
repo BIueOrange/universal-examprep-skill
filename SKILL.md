@@ -15,9 +15,12 @@ description: "通用期末考试 1 天极速备考教练（LLM Wiki & Ingest 重
 
 ### 第一步：一键大纲解析与本地化 (Zero-friction Ingestion)
 1. **智能解析**：快速阅读并解析用户上传的文件，提取所有的知识点、核心公式、高频题型和名词解释。
-2. **构建结构化 JSON**：在大脑中（或者在临时目录中）构建一份符合 `ingest.py` 要求的 `raw_input.json` 格式数据。
-3. **执行一键导入**：运行命令 `python .agents/skills/universal-exam-cram-coach/scripts/ingest.py --input <json_file>`。
-   * 该脚本会自动在当前工作区生成 `references/wiki/` 目录和 `references/quiz_bank.json` 题库，并初始化 `study_plan.md` 和 `study_progress.md`。
+2. **后台自动构建 JSON**：Agent 必须在后台自动构建一份符合 `ingest.py` 要求的 `raw_input.json` 格式数据，并将其以 `raw_input.json` 写入到临时目录（例如 scratch/ 目录）中。**绝对禁止要求或提示用户去手动创建、修改此 JSON 文件。**
+3. **执行一键导入**：运行命令 `python .agents/skills/universal-exam-cram-coach/scripts/ingest.py --input <temp_json_path>`。
+4. **【核心】无 Python 环境自动降级机制**：
+   * 如果运行该 Python 脚本失败（报错如 `python is not recognized` 或环境限制），Agent **必须立即且无感地自动执行降级逻辑**：
+   * 直接利用自身的 `write_to_file` / `write_file` 工具，手动在工作区创建 `references/wiki/` 目录，将章节知识切片分别写入 `ch1_xxx.md` 等，写入 `references/quiz_bank.json`，并依据 `templates/` 目录下的模板生成 `study_plan.md` 与 `study_progress.md`。
+   * 这保证了无论用户的系统上是否有 Python，环境都能 100% 成功建立。
 
 ### 第二步：按章节惰性加载授课 (Lazy Load Tutoring)
 1. **精准读取 Wiki**：在每一阶段的教学开始前，智能体**必须且仅**调用 `view_file` 工具读取该阶段关联的 Wiki 文件（例如 `references/wiki/ch1_concepts.md`）。**严禁**一次性读取或将全书知识塞入上下文。
